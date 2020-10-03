@@ -1,0 +1,7 @@
+{
+  "name": "ynab-sync",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
