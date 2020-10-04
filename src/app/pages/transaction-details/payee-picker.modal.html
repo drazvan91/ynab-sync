@@ -1,0 +1,21 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title>Pick payee</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-searchbar></ion-searchbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <ion-list>
+    <ion-item *ngFor="let payee of payees" (click)="selectPayee(payee.id)">
+      <ion-label>{{payee.name}}</ion-label>
+      <ion-icon
+        *ngIf="payee.id === selectedPayeeId"
+        name="checkmark-outline"
+        slot="end"
+      ></ion-icon>
+    </ion-item>
+  </ion-list>
+</ion-content>
