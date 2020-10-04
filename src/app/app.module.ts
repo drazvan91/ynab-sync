@@ -17,6 +17,9 @@ import { TransactionDetailsPage } from './pages/transaction-details/transaction-
 import { PayeeRepository } from './database/payee.repository';
 import { PayeePickerModal } from './pages/transaction-details/payee-picker.modal';
 import { TransactionRepository } from './database/transaction.repository';
+import { SmsReaderService } from './services/sms-reader.service';
+import { SmsParserService } from './services/sms-parser.service';
+import { MappingsService } from './services/mappings.service';
 
 @NgModule({
   declarations: [AppComponent, TransactionDetailsPage, PayeePickerModal],
@@ -38,6 +41,9 @@ import { TransactionRepository } from './database/transaction.repository';
     TransactionRepository,
     SyncService,
     SmsService,
+    SmsReaderService,
+    SmsParserService,
+    MappingsService,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
   bootstrap: [AppComponent],

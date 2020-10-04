@@ -38,7 +38,7 @@ export class SyncService {
       return {
         id: a.id,
         name: a.name,
-        mappedName: existingAccount?.mappedName,
+        mappedNames: existingAccount?.mappedNames || [],
       };
     });
 

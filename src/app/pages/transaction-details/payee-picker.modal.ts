@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { PayeeModel } from 'src/app/database/models';
 import { PayeeRepository } from 'src/app/database/payee.repository';
+import { MappingsService } from 'src/app/services/mappings.service';
 
 @Component({
   templateUrl: 'payee-picker.modal.html',

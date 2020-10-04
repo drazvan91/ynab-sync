@@ -9,6 +9,7 @@ import {
 } from 'src/app/database/models';
 import { PayeeRepository } from 'src/app/database/payee.repository';
 import { TransactionRepository } from 'src/app/database/transaction.repository';
+import { MappingsService } from 'src/app/services/mappings.service';
 import { PayeePickerModal } from './payee-picker.modal';
 
 @Component({
@@ -24,7 +25,8 @@ export class TransactionDetailsPage implements OnInit {
     private modalController: ModalController,
     private accountRepo: AccountRepository,
     private transactionRepo: TransactionRepository,
-    private payeeRepo: PayeeRepository
+    private payeeRepo: PayeeRepository,
+    private mappingsService: MappingsService
   ) {}
 
   async ngOnInit() {
@@ -40,6 +42,10 @@ export class TransactionDetailsPage implements OnInit {
     const account = this.accounts.find((a) => a.id === ev.detail.value);
     this.transaction.account = account;
     await this.save();
+    await this.mappingsService.mapAccount(
+      this.transaction.rawAccount,
+      account.id
+    );
   }
 
   public async openPayeeModal() {
@@ -58,6 +64,8 @@ export class TransactionDetailsPage implements OnInit {
     if (data?.payeeId) {
       const payee = await this.payeeRepo.getById(data.payeeId);
       this.transaction.payee = payee;
+      await this.save();
+      await this.mappingsService.mapPayee(this.transaction.rawPayee, payee.id);
     }
   }
 

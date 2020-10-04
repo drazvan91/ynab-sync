@@ -1,6 +1,6 @@
 export interface AccountModel {
   name: string;
-  mappedName?: string;
+  mappedNames: string[];
   id: string;
 }
 
