@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Plugins } from '@capacitor/core';
+import { parse } from 'date-fns';
 import { AccountRepository } from './account.repository';
-import { TransactionModel } from './models';
+import { TransactionModel, TransactionStatus } from './models';
 import { PayeeRepository } from './payee.repository';
 
 const { Storage } = Plugins;
@@ -39,6 +40,7 @@ export class TransactionRepository {
     return dbModels.map((model) => {
       return {
         ...model,
+        date: new Date(model.date),
         account: accounts.find((a) => a.id === model.accountId),
         payee: payees.find((p) => p.id === model.payeeId),
       };
@@ -52,10 +54,18 @@ export class TransactionRepository {
 
   public async setAll(transactions: TransactionModel[]) {
     const dbModels = transactions.map<TransactionDbModel>((t) => {
+      let status = t.status;
+      if (status === TransactionStatus.NotReady) {
+        if (t.account && t.payee) {
+          status = TransactionStatus.Ready;
+        }
+      }
+
       return {
         ...t,
         accountId: t.account?.id,
         payeeId: t.payee?.id,
+        status,
       };
     });
 

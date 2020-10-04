@@ -1,6 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title> Tab 1 </ion-title>
+    <ion-title> Transaction </ion-title>
+    <ion-button slot="end" (click)="syncTransactions()">Sync</ion-button>
   </ion-toolbar>
 </ion-header>
 
@@ -32,7 +33,7 @@
           *ngFor="let transaction of transactions"
         >
           <ion-avatar slot="end">
-            <img src="./avatar-ben.png" />
+            <ion-icon [name]="getIconName(transaction)"></ion-icon>
           </ion-avatar>
           <ion-label>
             <h2>
