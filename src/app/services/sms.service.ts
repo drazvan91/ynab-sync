@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AccountRepository } from '../database/account.repository';
+import { ConfigRepository } from '../database/config.repository';
 import { TransactionModel, TransactionStatus } from '../database/models';
 import { PayeeRepository } from '../database/payee.repository';
 import { TransactionRepository } from '../database/transaction.repository';
@@ -21,11 +22,13 @@ export class SmsService {
     private accountRepo: AccountRepository,
     private payeeRepo: PayeeRepository,
     private smsReader: SmsReaderService,
-    private smsParser: SmsParserService
+    private smsParser: SmsParserService,
+    private configRepo: ConfigRepository
   ) {}
 
   public async importSmsList() {
-    const rawSmsList = await this.smsReader.read('BT Carduri', 0, 10);
+    const startDate = (await this.configRepo.getStartDate()) || new Date();
+    const rawSmsList = await this.smsReader.readUntil(startDate);
     const parsedSmsList = this.smsParser.parse(rawSmsList);
 
     console.table(parsedSmsList);

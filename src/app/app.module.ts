@@ -20,6 +20,7 @@ import { TransactionRepository } from './database/transaction.repository';
 import { SmsReaderService } from './services/sms-reader.service';
 import { SmsParserService } from './services/sms-parser.service';
 import { MappingsService } from './services/mappings.service';
+import { ConfigRepository } from './database/config.repository';
 
 @NgModule({
   declarations: [AppComponent, TransactionDetailsPage, PayeePickerModal],
@@ -44,6 +45,7 @@ import { MappingsService } from './services/mappings.service';
     SmsReaderService,
     SmsParserService,
     MappingsService,
+    ConfigRepository,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
   bootstrap: [AppComponent],

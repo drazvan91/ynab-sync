@@ -10,6 +10,22 @@
 
   <ion-list>
     <ion-item>
+      <ion-label>Start date</ion-label>
+      <ion-datetime
+        displayFormat="YYYY/MM/DD"
+        [value]="startDate"
+        placeholder="Select date"
+        (ionChange)="startDateChanged($event)"
+      ></ion-datetime>
+    </ion-item>
+    <ion-item>
+      <ion-label>YNAB Token</ion-label>
+      <ion-input
+        [value]="ynabToken"
+        (ionChange)="ynabTokenChanged($event)"
+      ></ion-input>
+    </ion-item>
+    <ion-item>
       <ion-label>Budget</ion-label>
       <ion-select
         [value]="selectedBudgetId"

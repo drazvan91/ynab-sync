@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Diagnostic } from '@ionic-native/diagnostic';
+import { isAfter, isBefore } from 'date-fns';
 import { mockedData } from './sms-reader-mocked-data';
 
 export interface SmsModel {
@@ -17,7 +18,7 @@ export class SmsReaderService {
     skip: number,
     take: number
   ): Promise<SmsModel[]> {
-    if (true) {
+    if (false) {
       return mockedData;
     }
 
@@ -28,7 +29,7 @@ export class SmsReaderService {
 
     const promise = new Promise<SmsModel[]>((resolve, reject) => {
       const filter = {
-        box: 'inbox',
+        // box: 'inbox',
         // address: from,
         indexFrom: skip,
         maxCount: take,
@@ -38,6 +39,24 @@ export class SmsReaderService {
     });
 
     return await promise;
+  }
+
+  public async readUntil(date: Date): Promise<SmsModel[]> {
+    let smsList: SmsModel[] = [];
+    const PAGE_SIZE = 10;
+    let pageStart = 0;
+    while (true) {
+      const page = await this.read(undefined, pageStart, PAGE_SIZE);
+      smsList = [...smsList, ...page.filter((p) => isAfter(p.date, date))];
+      console.log('page', pageStart, page);
+
+      if (page.find((p) => isBefore(p.date, date)) || page.length === 0) {
+        break;
+      }
+      pageStart += PAGE_SIZE;
+    }
+
+    return smsList;
   }
 
   private async requestPermission() {

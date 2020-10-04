@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { IonSlides } from '@ionic/angular';
+import { compareAsc, compareDesc } from 'date-fns';
 import { TransactionModel, TransactionStatus } from '../database/models';
 import { TransactionRepository } from '../database/transaction.repository';
 import { SyncService } from '../services/sync.service';
@@ -27,6 +28,9 @@ export class Tab1Page implements OnInit {
 
   async ngOnInit() {
     this.transactions = await this.transactionsRepo.getAll();
+    this.transactions = this.transactions.sort((a, b) => {
+      return compareDesc(a.date, b.date);
+    });
   }
 
   public getIconName(transaction: TransactionModel): string {

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { formatISO } from 'date-fns';
-import { ynabToken } from 'src/constants';
 import { API, BulkTransactions, SaveTransaction } from 'ynab';
 import { AccountRepository } from '../database/account.repository';
 import { BudgetRepository } from '../database/budget.repository';
+import { ConfigRepository } from '../database/config.repository';
 import {
   AccountModel,
   BudgetModel,
@@ -15,14 +15,17 @@ import { TransactionRepository } from '../database/transaction.repository';
 
 @Injectable()
 export class SyncService {
-  private ynabApi: API;
   constructor(
     private accountsRepo: AccountRepository,
     private budgetRepo: BudgetRepository,
     private payeeRepo: PayeeRepository,
-    private transactionRepo: TransactionRepository
-  ) {
-    this.ynabApi = new API(ynabToken);
+    private transactionRepo: TransactionRepository,
+    private configRepo: ConfigRepository
+  ) {}
+
+  private async getYnabApi(): Promise<API> {
+    const token = await this.configRepo.getToken();
+    return new API(token);
   }
 
   public async sync() {
@@ -38,9 +41,10 @@ export class SyncService {
   }
 
   private async syncAccounts(budgetId: string) {
+    const ynabApi = await this.getYnabApi();
     const existingAccounts = await this.accountsRepo.getAll();
 
-    const response = await this.ynabApi.accounts.getAccounts(budgetId);
+    const response = await ynabApi.accounts.getAccounts(budgetId);
     const accounts = response.data.accounts.map<AccountModel>((a) => {
       const existingAccount = existingAccounts.find((ea) => ea.id === a.id);
       return {
@@ -54,9 +58,11 @@ export class SyncService {
   }
 
   private async syncPayees(budgetId: string) {
+    const ynabApi = await this.getYnabApi();
+
     const existingPayees = await this.payeeRepo.getAll();
 
-    const response = await this.ynabApi.payees.getPayees(budgetId);
+    const response = await ynabApi.payees.getPayees(budgetId);
     const payees = response.data.payees.map<PayeeModel>((p) => {
       const existingPayee = existingPayees.find((ep) => ep.id === p.id);
       return {
@@ -70,7 +76,9 @@ export class SyncService {
   }
 
   private async syncBudgets() {
-    const response = await this.ynabApi.budgets.getBudgets(false);
+    const ynabApi = await this.getYnabApi();
+
+    const response = await ynabApi.budgets.getBudgets(false);
     const budgets = response.data.budgets.map<BudgetModel>((b) => {
       return {
         id: b.id,
@@ -107,7 +115,8 @@ export class SyncService {
       throw 'No budget selected';
     }
 
-    await this.ynabApi.transactions.bulkCreateTransactions(
+    const ynabApi = await this.getYnabApi();
+    await ynabApi.transactions.bulkCreateTransactions(
       budgetId,
       bulkTransactions
     );
