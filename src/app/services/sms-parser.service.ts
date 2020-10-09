@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SmsModel } from './sms-reader.service';
 import { ParsedSms } from './sms.service';
-import { parse } from 'date-fns';
 @Injectable()
 export class SmsParserService {
   public parse(smsList: SmsModel[]): ParsedSms[] {
@@ -16,7 +15,7 @@ export class SmsParserService {
         amount: parseFloat(result.amount),
         date: new Date(sms.date),
         payee: result.payee,
-        smsId: `${sms.thread_id}-${sms._id}`,
+        smsId: `${sms.threadId}-${sms.id}`,
       };
     });
 
@@ -27,7 +26,6 @@ export class SmsParserService {
     const regex = /Suma (?<amount>[0-9.]+) (?<currency>EUR|RON|USD).* Card nr. (?<card>[\*0-9]+).* (?<date>\d\d\.\d\d\.\d\d \d\d:\d\d).*Comerciant: (?<payee>.*)/;
 
     const result = body.match(regex);
-    console.log(result);
     if (!result) return undefined;
 
     return result.groups;

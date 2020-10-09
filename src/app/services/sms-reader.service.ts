@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Diagnostic } from '@ionic-native/diagnostic';
+import { Plugins } from '@capacitor/core';
+import 'capacitor-sms-reader';
 import { isAfter, isBefore } from 'date-fns';
 import { mockedData } from './sms-reader-mocked-data';
 
+const { SmsReader } = Plugins;
+
 export interface SmsModel {
-  _id: number;
-  thread_id: number;
+  id: number;
+  threadId: number;
   address: string;
   body: string;
   date: number;
@@ -22,7 +25,9 @@ export class SmsReaderService {
       return mockedData;
     }
 
-    await this.requestPermission();
+    const result = await SmsReader.read({ skip, take });
+    return result.items;
+
     if (!window['SMS']) {
       return Promise.reject('SMS cordova plugin is not available');
     }
@@ -57,23 +62,5 @@ export class SmsReaderService {
     }
 
     return smsList;
-  }
-
-  private async requestPermission() {
-    const result = await Diagnostic.getPermissionAuthorizationStatus(
-      Diagnostic.permission.READ_SMS
-    );
-    console.log(result);
-
-    if (result === Diagnostic.permissionStatus.GRANTED) {
-      return;
-    }
-
-    Diagnostic.requestRuntimePermission(Diagnostic.permission.READ_SMS).then(
-      (data) => {
-        console.log(`getCameraAuthorizationStatus`);
-        console.log(data);
-      }
-    );
   }
 }
