@@ -36,28 +36,18 @@ export class MappingsService {
   }
 
   public async mapAccount(rawAccountName: string, accountId: string) {
-    const accounts = await this.accountRepo.getAll();
-    for (const account of accounts) {
-      account.mappedNames = account.mappedNames.filter(
-        (n) => n !== rawAccountName
-      );
-    }
+    const accounts = await this.accountRepo.assignRawAccount(rawAccountName, accountId);
 
-    const selectedAccount = accounts.find((a) => a.id === accountId);
-    selectedAccount.mappedNames.push(rawAccountName);
+    // const transactions = await this.transactionRepo.getAll();
+    // for (const transaction of transactions) {
+    //   if (
+    //     transaction.account === undefined &&
+    //     transaction.rawAccount === rawAccountName
+    //   ) {
+    //     transaction.account = selectedAccount;
+    //   }
+    // }
 
-    await this.accountRepo.setAll(accounts);
-
-    const transactions = await this.transactionRepo.getAll();
-    for (const transaction of transactions) {
-      if (
-        transaction.account === undefined &&
-        transaction.rawAccount === rawAccountName
-      ) {
-        transaction.account = selectedAccount;
-      }
-    }
-
-    await this.transactionRepo.setAll(transactions);
+    // await this.transactionRepo.setAll(transactions);
   }
 }

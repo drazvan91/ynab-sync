@@ -54,7 +54,7 @@ export class SyncService {
       };
     });
 
-    await this.accountsRepo.setAll(accounts);
+    await this.accountsRepo.syncAccounts(accounts);
   }
 
   private async syncPayees(budgetId: string) {

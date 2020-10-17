@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { RxDocument } from 'rxdb';
+import { Observable } from 'rxjs';
 import { AccountRepository } from '../database/account.repository';
 import { BudgetRepository } from '../database/budget.repository';
 import { ConfigRepository } from '../database/config.repository';
 import { BudgetModel } from '../database/models';
+import { AccountDbModel } from '../database/models/db-context';
 import { SmsService } from '../services/sms.service';
 import { SyncService } from '../services/sync.service';
 
@@ -44,7 +47,7 @@ export class Tab2Page implements OnInit {
 
   public async budgetChanged(ev: CustomEvent) {
     await this.budgetRepo.setSelected(ev.detail.value);
-    await this.accountsRepo.setAll([]);
+    // await this.accountsRepo.setAll([]);
   }
 
   public async startDateChanged(ev: CustomEvent) {

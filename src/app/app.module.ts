@@ -21,6 +21,7 @@ import { SmsReaderService } from './services/sms-reader.service';
 import { SmsParserService } from './services/sms-parser.service';
 import { MappingsService } from './services/mappings.service';
 import { ConfigRepository } from './database/config.repository';
+import { DatabaseModule } from './database/database.module';
 
 @NgModule({
   declarations: [AppComponent, TransactionDetailsPage, PayeePickerModal],
@@ -28,6 +29,7 @@ import { ConfigRepository } from './database/config.repository';
   imports: [
     BrowserModule,
     CommonModule,
+    DatabaseModule,
     IonicModule.forRoot({
       mode: 'md',
     }),

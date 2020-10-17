@@ -3,6 +3,7 @@ import { Plugins } from '@capacitor/core';
 import 'capacitor-sms-reader';
 import { isAfter, isBefore } from 'date-fns';
 import { mockedData } from './sms-reader-mocked-data';
+import { slice } from 'lodash';
 
 const { SmsReader } = Plugins;
 
@@ -21,29 +22,13 @@ export class SmsReaderService {
     skip: number,
     take: number
   ): Promise<SmsModel[]> {
-    if (false) {
-      return mockedData;
+    if (true) {
+      
+      return slice(mockedData, skip, skip+take);
     }
 
     const result = await SmsReader.read({ skip, take });
     return result.items;
-
-    if (!window['SMS']) {
-      return Promise.reject('SMS cordova plugin is not available');
-    }
-
-    const promise = new Promise<SmsModel[]>((resolve, reject) => {
-      const filter = {
-        // box: 'inbox',
-        // address: from,
-        indexFrom: skip,
-        maxCount: take,
-      };
-
-      window['SMS'].listSMS(filter, resolve, reject);
-    });
-
-    return await promise;
   }
 
   public async readUntil(date: Date): Promise<SmsModel[]> {
