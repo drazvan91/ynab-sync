@@ -99,14 +99,19 @@ export class SyncService {
     const toSyncTransactions = await this.transactionRepo.getReadyToSync();
     const bulkTransactions: BulkTransactions = {
       transactions: toSyncTransactions.map<SaveTransaction>((t) => {
+        const flagColor =
+          t.currency === 'RON'
+            ? SaveTransaction.FlagColorEnum.Blue
+            : SaveTransaction.FlagColorEnum.Red;
         return {
           account_id: t.accountId,
           date: formatISO(fromUnixTime(t.dateUnix)),
           amount: Math.floor(t.amount * 1000),
           payee_id: t.payeeId,
           category_id: null,
-          flag_color: SaveTransaction.FlagColorEnum.Blue,
-          import_id: 'impo' + t.id,
+          flag_color: flagColor,
+          memo: t.currency !== 'RON' ? t.amount + ' ' + t.currency : undefined,
+          import_id: 'imp' + t.id,
         };
       }),
     };

@@ -14,7 +14,11 @@
           >
         </h2>
         <h3>
-          {{ transaction.amount }} RON - {{ transaction.accountName }}
+          {{ transaction.amount }}
+          <span [style]="transaction.currency !== 'RON' ? 'color: red' : ''">
+            {{ transaction.currency }}
+          </span>
+          - {{ transaction.accountName }}
           <span *ngIf="!transaction.accountName" style="color: red"
             >UNKWNOWN</span
           >

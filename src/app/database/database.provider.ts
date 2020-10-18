@@ -45,7 +45,7 @@ export class DatabaseProvider {
     console.log('Adaptor being used: ', adapter);
 
     this.database = await createRxDatabase({
-      name: 'ynabdb2',
+      name: 'ynabdb3',
       adapter,
       pouchSettings: {
         location: 'default',

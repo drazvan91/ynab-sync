@@ -14,6 +14,7 @@ export class SmsParserService {
       return {
         account: result.card,
         amount: parseFloat(result.amount),
+        currency: result.currency,
         date: new Date(sms.date),
         payee: result.payee,
         smsId: `${sms.threadId}-${sms.id}`,

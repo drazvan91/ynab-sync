@@ -17,6 +17,7 @@ export interface ParsedSms {
   account: string;
   payee: string;
   date: Date;
+  currency: string;
 }
 
 @Injectable()
@@ -53,6 +54,7 @@ export class SmsService {
       return {
         id: sms.smsId,
         amount: sms.amount,
+        currency: sms.currency,
         dateUnix: getUnixTime(sms.date),
         rawAccount: sms.account,
         rawPayee: sms.payee,

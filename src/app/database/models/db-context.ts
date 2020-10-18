@@ -33,6 +33,7 @@ export enum TransactionStatus {
 export interface TransactionDbModel {
   id: string;
   smsId: string;
+  currency: string;
   amount: number;
   dateUnix: number;
   rawAccount: string;

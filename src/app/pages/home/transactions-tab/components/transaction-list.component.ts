@@ -9,6 +9,7 @@ export interface TransactionListItem {
   payeeName?: string;
   amount: number;
   date: Date;
+  currency: string;
   status: TransactionStatus;
 }
 

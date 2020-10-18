@@ -85,6 +85,7 @@ export class TransactionsTab implements OnInit {
         accountName: accounts.find((a) => a.id === t.accountId)?.name,
         payeeName: payees.find((p) => p.id === t.payeeId)?.name,
         amount: t.amount,
+        currency: t.currency,
         rawPayee: t.rawPayee,
         status: t.status,
         id: t.id,

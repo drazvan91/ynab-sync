@@ -20,11 +20,10 @@ export class SmsReaderService {
   public async read(
     from: string,
     skip: number,
-    take: number
+    take: number,
   ): Promise<SmsModel[]> {
-    if (true) {
-      
-      return slice(mockedData, skip, skip+take);
+    if (false) {
+      return slice(mockedData, skip, skip + take);
     }
 
     const result = await SmsReader.read({ skip, take });
