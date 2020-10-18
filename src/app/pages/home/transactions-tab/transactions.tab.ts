@@ -35,7 +35,7 @@ const sliderNamesMap = {
 @Component({
   selector: 'home-transactions-tab',
   templateUrl: 'transactions.tab.html',
-  styleUrls: [],
+  styleUrls: ['./transactions.tab.scss'],
 })
 export class TransactionsTab implements OnInit {
   @ViewChild('slider', { static: false }) slider: IonSlides;

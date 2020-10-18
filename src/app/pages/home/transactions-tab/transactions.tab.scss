@@ -1,0 +1,8 @@
+:host {
+  ion-segment {
+    --background: var(
+      --ion-toolbar-background,
+      var(--ion-background-color, #fff)
+    );
+  }
+}
