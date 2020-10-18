@@ -106,7 +106,7 @@ export class SyncService {
         return {
           account_id: t.accountId,
           date: formatISO(fromUnixTime(t.dateUnix)),
-          amount: Math.floor(t.amount * 1000),
+          amount: 0 - Math.floor(t.amount * 1000),
           payee_id: t.payeeId,
           category_id: null,
           flag_color: flagColor,

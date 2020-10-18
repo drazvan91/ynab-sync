@@ -31,6 +31,6 @@ const schema: RxJsonSchema = {
     'rawPayee',
     'status',
   ],
-  indexes: [],
+  indexes: ['dateUnix'],
 };
 export default schema;

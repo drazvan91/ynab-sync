@@ -37,7 +37,6 @@ export class SmsReaderService {
     while (true) {
       const page = await this.read(undefined, pageStart, PAGE_SIZE);
       smsList = [...smsList, ...page.filter((p) => isAfter(p.date, date))];
-      console.log('page', pageStart, page);
 
       if (page.find((p) => isBefore(p.date, date)) || page.length === 0) {
         break;

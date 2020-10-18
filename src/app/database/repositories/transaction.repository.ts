@@ -7,11 +7,15 @@ export class TransactionRepository {
   constructor(private dbProvider: DatabaseProvider) {}
 
   public getAll$() {
-    return this.dbProvider.get().transactions.find().$;
+    return this.dbProvider.get().transactions.find().sort('dateUnix').$;
   }
 
   public async getAll(): Promise<TransactionDbModel[]> {
-    return await this.dbProvider.get().transactions.find().exec();
+    return await this.dbProvider
+      .get()
+      .transactions.find()
+      .sort('dateUnix')
+      .exec();
   }
 
   public getReadyToSync$() {
@@ -23,25 +27,31 @@ export class TransactionRepository {
   }
 
   private getReadyToSyncInternal() {
-    return this.dbProvider.get().transactions.find({
-      selector: {
-        accountId: { $exists: true },
-        payeeId: { $exists: true },
-        status: TransactionStatus.New,
-      },
-    });
+    return this.dbProvider
+      .get()
+      .transactions.find({
+        selector: {
+          accountId: { $exists: true },
+          payeeId: { $exists: true },
+          status: TransactionStatus.New,
+        },
+      })
+      .sort('dateUnix');
   }
 
   public getNotReadyToSync$() {
-    return this.dbProvider.get().transactions.find({
-      selector: {
-        status: TransactionStatus.New,
-        $or: [
-          { accountId: { $exists: false } },
-          { payeeId: { $exists: false } },
-        ],
-      },
-    }).$;
+    return this.dbProvider
+      .get()
+      .transactions.find({
+        selector: {
+          status: TransactionStatus.New,
+          $or: [
+            { accountId: { $exists: false } },
+            { payeeId: { $exists: false } },
+          ],
+        },
+      })
+      .sort('dateUnix').$;
   }
 
   public getById$(transactionId: string) {

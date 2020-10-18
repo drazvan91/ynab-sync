@@ -72,6 +72,16 @@ export class TransactionDetailsPage implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.accountRepo.getAll$().subscribe((accounts) => {
         this.accounts = accounts;
+
+        // hotfix because of the dropdown issue
+        // I will just reset the selectedvalue
+        if (this.transaction?.accountId) {
+          const value = this.transaction;
+          this.transaction = undefined;
+          setTimeout(() => {
+            this.transaction = value;
+          }, 300);
+        }
       }),
     );
   }
