@@ -129,4 +129,14 @@ export const mockedData = [
       'Tranz POS. Suma 30.61 RON. Card nr. ****6747, RAZVAN DRAGOMIR. 02.10.20 15:34. Suma disponibila: 10012.55 RON. Comerciant: TABAC X054 CJ OFF C2, RO,CLUJ, .',
     serviceCenter: '+40744007506',
   },
+  {
+    id: 51,
+    threadId: 9,
+    address: 'BTCarduri',
+    date: 1601642064059,
+    dateSent: 1601640080000,
+    body:
+      'Tranz POS. Suma 30.61 RON. Card nr. ****6747, RAZVAN DRAGOMIR. 02.10.20 15:34. Suma disponibila: 10012.55 RON. Comerciant: TABAC X054 CJ OFF C2, RO,CLUJ, .',
+    serviceCenter: '+40744007506',
+  },
 ];

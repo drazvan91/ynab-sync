@@ -49,7 +49,7 @@ export class TransactionRepository {
   }
 
   public async bulkInsert(newTransactions: TransactionDbModel[]) {
-    await this.dbProvider.get().transactions.bulkInsert(newTransactions);
+    return await this.dbProvider.get().transactions.bulkInsert(newTransactions);
   }
 
   public async updateAccountForTransaction(id: string, accountId: string) {

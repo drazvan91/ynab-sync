@@ -1,12 +1,15 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title> Transaction </ion-title>
-    <ion-button
-      slot="end"
-      [disabled]="(readyToSyncCount$ | async) === 0"
-      (click)="syncTransactions()"
-      >Sync</ion-button
-    >
+    <ion-buttons slot="end">
+      <ion-button (click)="checkSms()"> Check SMS </ion-button>
+      <ion-button
+        [disabled]="(readyToSyncCount$ | async) === 0"
+        (click)="syncTransactions()"
+      >
+        Sync
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
   <ion-segment
     color="primary"

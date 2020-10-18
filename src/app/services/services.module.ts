@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
-import { MappingsService, SmsService, SyncService } from '.';
+import { MappingsService } from './mappings.service';
 import { SmsParserService } from './sms-parser.service';
 import { SmsReaderService } from './sms-reader.service';
+import { SmsService } from './sms.service';
+import { SyncService } from './sync.service';
 
 @NgModule({
   imports: [],

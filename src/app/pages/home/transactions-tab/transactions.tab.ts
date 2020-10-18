@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonSlides } from '@ionic/angular';
+import { IonSlides, ToastController } from '@ionic/angular';
 import { fromUnixTime } from 'date-fns';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -7,13 +7,13 @@ import {
   AccountDbModel,
   PayeeDbModel,
   TransactionDbModel,
-  TransactionStatus,
 } from 'src/app/database/models';
 import {
   AccountRepository,
   PayeeRepository,
   TransactionRepository,
 } from 'src/app/database/repositories';
+import { SmsService } from 'src/app/services';
 import { SyncService } from 'src/app/services/sync.service';
 import { TransactionListItem } from './components/transaction-list.component';
 
@@ -104,15 +104,12 @@ export class TransactionsTab implements OnInit {
     private transactionRepo: TransactionRepository,
     private accountRepo: AccountRepository,
     private payeeRepo: PayeeRepository,
+    private smsService: SmsService,
     private syncService: SyncService,
+    public toastController: ToastController,
   ) {}
 
-  async ngOnInit() {
-    // this.transactions = await this.transactionsRepo.getAll();
-    // this.transactions = this.transactions.sort((a, b) => {
-    //   return compareDesc(a.date, b.date);
-    // });
-  }
+  async ngOnInit() {}
 
   public segmentChanged(ev: CustomEvent) {
     this.selectedSegment = ev.detail.value;
@@ -127,6 +124,15 @@ export class TransactionsTab implements OnInit {
         this.selectedSegment = key;
       }
     }
+  }
+
+  public async checkSms() {
+    const newTransactions = await this.smsService.importSmsList();
+    const toast = await this.toastController.create({
+      message: newTransactions.length + ' new transactions added',
+      duration: 2000,
+    });
+    toast.present();
   }
 
   public async syncTransactions() {

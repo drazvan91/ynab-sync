@@ -30,16 +30,18 @@ export class SyncService {
     return new API(token);
   }
 
-  public async sync() {
-    await this.syncBudgets();
-
+  public async syncPayeesAndAccounts() {
     const budgetId = await this.budgetRepo.getSelected();
     if (!budgetId) {
       return;
     }
 
-    await this.syncAccounts(budgetId);
-    await this.syncPayees(budgetId);
+    const resultAccounts = await this.syncAccounts(budgetId);
+    const resultPayees = await this.syncPayees(budgetId);
+    return {
+      accounts: resultAccounts,
+      payeess: resultPayees,
+    };
   }
 
   private async syncAccounts(budgetId: string) {
@@ -56,7 +58,7 @@ export class SyncService {
       };
     });
 
-    await this.accountsRepo.syncAccounts(accounts);
+    return await this.accountsRepo.syncAccounts(accounts);
   }
 
   private async syncPayees(budgetId: string) {
@@ -71,10 +73,10 @@ export class SyncService {
       };
     });
 
-    await this.payeeRepo.syncPayees(payees);
+    return await this.payeeRepo.syncPayees(payees);
   }
 
-  private async syncBudgets() {
+  public async syncBudgets() {
     const ynabApi = await this.getYnabApi();
 
     const response = await ynabApi.budgets.getBudgets(false);
@@ -85,7 +87,7 @@ export class SyncService {
       };
     });
 
-    await this.budgetRepo.syncBudgets(budgets);
+    return await this.budgetRepo.syncBudgets(budgets);
   }
 
   public async syncTransactions() {

@@ -25,7 +25,9 @@ export class TransactionListComponent implements OnInit {
   public getIconName(transaction: TransactionListItem): string {
     switch (transaction.status) {
       case TransactionStatus.New:
-        return 'warning';
+        return transaction.accountName && transaction.payeeName
+          ? 'add-outline'
+          : 'warning';
       case TransactionStatus.Synced:
         return 'checkmark-done';
       case TransactionStatus.Syncing:

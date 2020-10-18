@@ -5,37 +5,69 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-button (click)="sync()">Sync</ion-button>
-  <ion-button (click)="syncSms()">Sync sms</ion-button>
-
-  <ion-list>
-    <ion-item>
-      <ion-label>Start date</ion-label>
-      <ion-datetime
-        displayFormat="YYYY/MM/DD"
-        [value]="startDate"
-        placeholder="Select date"
-        (ionChange)="startDateChanged($event)"
-      ></ion-datetime>
-    </ion-item>
-    <ion-item>
-      <ion-label>YNAB Token</ion-label>
-      <ion-input
-        [value]="ynabToken"
-        (ionChange)="ynabTokenChanged($event)"
-      ></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label>Budget</ion-label>
-      <ion-select
-        [value]="selectedBudgetId"
-        placeholder="Select One"
-        (ionChange)="budgetChanged($event)"
-      >
-        <ion-select-option *ngFor="let budget of budgets" [value]="budget.id"
-          >{{budget.name}}</ion-select-option
-        >
-      </ion-select>
-    </ion-item>
-  </ion-list>
+  <ion-card>
+    <ion-card-header>General settings</ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-label>Start date</ion-label>
+          <ion-datetime
+            displayFormat="YYYY/MM/DD"
+            [value]="startDate"
+            placeholder="Select date"
+            (ionChange)="startDateChanged($event)"
+          ></ion-datetime>
+        </ion-item>
+        <ion-item>
+          <ion-label>YNAB Token</ion-label>
+          <ion-input
+            [value]="ynabToken"
+            (ionChange)="ynabTokenChanged($event)"
+          ></ion-input>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-card-header> Selected budget configuration </ion-card-header>
+    <ion-card-content>
+      <ion-button (click)="syncBudgets()">Refresh</ion-button>
+      <ion-list>
+        <ion-item>
+          <ion-label>Budget</ion-label>
+          <ion-select
+            [value]="selectedBudgetId"
+            placeholder="Select One"
+            (ionChange)="budgetChanged($event)"
+          >
+            <ion-select-option
+              *ngFor="let budget of budgets$ | async"
+              [value]="budget.id"
+              >{{budget.name}}</ion-select-option
+            >
+          </ion-select>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-card-header> Payees & Accounts </ion-card-header>
+    <ion-card-content>
+      <ion-button (click)="syncPayeesAndAccount()">Refresh</ion-button>
+      <ion-list>
+        <ion-item>
+          <ion-label>Accounts</ion-label>
+          <ion-note color="primary" slot="end"
+            >{{ accountsCount$ | async }}</ion-note
+          >
+        </ion-item>
+        <ion-item>
+          <ion-label>Payees</ion-label>
+          <ion-note color="primary" slot="end"
+            >{{ payeesCount$ | async }}
+          </ion-note>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

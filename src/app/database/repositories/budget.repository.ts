@@ -32,6 +32,10 @@ export class BudgetRepository {
     return this.dbProvider.get().budgets.find().exec();
   }
 
+  public getAll$() {
+    return this.dbProvider.get().budgets.find().$;
+  }
+
   public async syncBudgets(budgets: BudgetDbModel[]) {
     const budgetIds = budgets.map((a) => a.id);
 

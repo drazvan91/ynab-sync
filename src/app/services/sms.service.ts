@@ -27,7 +27,7 @@ export class SmsService {
     private payeeRepo: PayeeRepository,
     private smsReader: SmsReaderService,
     private smsParser: SmsParserService,
-    private configRepo: ConfigRepository
+    private configRepo: ConfigRepository,
   ) {}
 
   public async importSmsList() {
@@ -37,7 +37,7 @@ export class SmsService {
 
     const transactions = await this.transactionRepo.getAll();
     const newSmses = parsedSmsList.filter(
-      (sms) => transactions.find((t) => t.smsId === sms.smsId) === undefined
+      (sms) => transactions.find((t) => t.smsId === sms.smsId) === undefined,
     );
 
     const accounts = await this.accountRepo.getAll();
@@ -45,7 +45,7 @@ export class SmsService {
 
     const newTransactions = newSmses.map<TransactionDbModel>((sms) => {
       const account = accounts.find(
-        (a) => a.mappedNames.indexOf(sms.account) >= 0
+        (a) => a.mappedNames.indexOf(sms.account) >= 0,
       );
       const payee = payees.find((p) => p.mappedNames.indexOf(sms.payee) >= 0);
       const status = TransactionStatus.New;
@@ -63,6 +63,7 @@ export class SmsService {
       } as TransactionDbModel;
     });
 
-    await this.transactionRepo.bulkInsert(newTransactions);
+    const result = await this.transactionRepo.bulkInsert(newTransactions);
+    return result.success;
   }
 }
