@@ -5,9 +5,7 @@
       *ngFor="let transaction of items"
       [routerLink]="['/transaction', transaction.id]"
     >
-      <ion-avatar slot="end">
-        <!-- <ion-icon [name]="getIconName(transaction)"></ion-icon> -->
-      </ion-avatar>
+      <ion-icon slot="end" [name]="getIconName(transaction)"></ion-icon>
       <ion-label>
         <h2>
           {{ transaction.date | date }} - {{ transaction.payeeName }}

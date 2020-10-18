@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { TransactionDbModel, TransactionStatus } from 'src/app/database';
 
 export interface TransactionListItem {
   id: string;
@@ -8,6 +9,7 @@ export interface TransactionListItem {
   payeeName?: string;
   amount: number;
   date: Date;
+  status: TransactionStatus;
 }
 
 @Component({
@@ -19,4 +21,17 @@ export class TransactionListComponent implements OnInit {
   @Input() items: TransactionListItem[];
 
   ngOnInit(): void {}
+
+  public getIconName(transaction: TransactionListItem): string {
+    switch (transaction.status) {
+      case TransactionStatus.New:
+        return 'warning';
+      case TransactionStatus.Synced:
+        return 'checkmark-done';
+      case TransactionStatus.Syncing:
+        return 'swap-horizontal';
+      default:
+        return 'empty';
+    }
+  }
 }

@@ -15,16 +15,7 @@ import {
   TransactionRepository,
 } from 'src/app/database/repositories';
 import { SyncService } from 'src/app/services/sync.service';
-
-interface TransactionItem {
-  id: string;
-  rawAccount: string;
-  accountName?: string;
-  rawPayee: string;
-  payeeName?: string;
-  amount: number;
-  date: Date;
-}
+import { TransactionListItem } from './components/transaction-list.component';
 
 const sliderNamesMap = {
   'not-ready-transactions': 0,
@@ -75,7 +66,7 @@ export class TransactionsTab implements OnInit {
     accounts: AccountDbModel[],
     payees: PayeeDbModel[],
   ) {
-    return transactions.map<TransactionItem>((t) => {
+    return transactions.map<TransactionListItem>((t) => {
       return {
         date: fromUnixTime(t.dateUnix),
         rawAccount: t.rawAccount,
@@ -83,6 +74,7 @@ export class TransactionsTab implements OnInit {
         payeeName: payees.find((p) => p.id === t.payeeId)?.name,
         amount: t.amount,
         rawPayee: t.rawPayee,
+        status: t.status,
         id: t.id,
       };
     });
@@ -108,18 +100,6 @@ export class TransactionsTab implements OnInit {
     // this.transactions = this.transactions.sort((a, b) => {
     //   return compareDesc(a.date, b.date);
     // });
-  }
-
-  public getIconName(transaction: TransactionDbModel): string {
-    switch (transaction.status) {
-      case TransactionStatus.New:
-        return 'warning';
-      case TransactionStatus.Synced:
-        return 'checkmark-done';
-      case TransactionStatus.Syncing:
-        return 'swap-horizontal';
-      default:
-    }
   }
 
   public segmentChanged(ev: CustomEvent) {
