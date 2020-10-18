@@ -5,7 +5,10 @@
       <ion-button (click)="dismissModal()">Close</ion-button>
     </ion-buttons>
   </ion-toolbar>
-  <ion-searchbar></ion-searchbar>
+  <ion-searchbar
+    #searchBar
+    (ionChange)="searchTermChanged($event)"
+  ></ion-searchbar>
 </ion-header>
 <ion-content [fullscreen]="true">
   <ion-list>

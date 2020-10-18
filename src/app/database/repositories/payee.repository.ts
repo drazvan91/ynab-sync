@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { escapeRegExp } from 'lodash';
 import { RxDocument } from 'rxdb';
 import { DatabaseProvider } from '../database.provider';
 import { PayeeDbModel } from '../models';
@@ -9,6 +10,12 @@ export class PayeeRepository {
 
   public getAll$() {
     return this.dbProvider.get().payees.find().$;
+  }
+
+  public search$(searchTerm: string) {
+    const regexp = new RegExp('.*' + escapeRegExp(searchTerm) + '.*', 'i');
+
+    return this.dbProvider.get().payees.find().where('name').regex(regexp).$;
   }
 
   public getAll() {
