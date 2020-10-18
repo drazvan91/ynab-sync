@@ -3,7 +3,13 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { TransactionDetailsPage } from './pages/transaction-details/transaction-details.page';
 
 const routes: Routes = [
-  { path: 'transaction/:id', component: TransactionDetailsPage },
+  {
+    path: 'transaction/:id',
+    loadChildren: () =>
+      import('./pages/transaction-details/transaction-details.module').then(
+        (m) => m.SettingsTabModule,
+      ),
+  },
   {
     path: '',
     loadChildren: () =>
