@@ -17,7 +17,7 @@ import { PayeePickerModal } from './components/payee-picker.modal';
 
 @Component({
   templateUrl: 'transaction-details.page.html',
-  styleUrls: [],
+  styleUrls: ['./transaction-details.page.scss'],
 })
 export class TransactionDetailsPage implements OnInit, OnDestroy {
   public transaction: TransactionDbModel;

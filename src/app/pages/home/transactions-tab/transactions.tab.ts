@@ -31,6 +31,12 @@ const sliderNamesMap = {
 export class TransactionsTab implements OnInit {
   @ViewChild('slider', { static: false }) slider: IonSlides;
 
+  public hasValidChanges$ = this.transactionRepo.getReadyToSync$().pipe(
+    map((transactions) => {
+      return transactions.length > 0;
+    }),
+  );
+
   public notReadyTransactions$ = combineLatest([
     this.transactionRepo.getNotReadyToSync$(),
     this.accountRepo.getAll$(),

@@ -38,9 +38,11 @@
       <ion-button *ngIf="!payee"> Pick one </ion-button>
       <ion-note *ngIf="payee" slot="end"> {{payee.name}} </ion-note>
     </ion-item>
-    <ion-item>
+    <ion-item class="raw-payee">
       <ion-label>Raw payee</ion-label>
-      <ion-note slot="end">{{transaction.rawPayee}}</ion-note>
+      <ion-note class="ion-text-wrap" slot="end"
+        >{{transaction.rawPayee}}</ion-note
+      >
     </ion-item>
   </ion-list>
 </ion-content>

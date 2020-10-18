@@ -1,0 +1,9 @@
+:host {
+  display: block;
+
+  .raw-payee {
+    ion-note {
+      max-width: 60%;
+    }
+  }
+}
