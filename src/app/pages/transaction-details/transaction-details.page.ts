@@ -6,16 +6,14 @@ import { of, Subscription } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import {
   AccountDbModel,
+  AccountRepository,
   PayeeDbModel,
-  TransactionDbModel,
-} from 'src/app/database/models/db-context';
-import {
   PayeeRepository,
+  TransactionDbModel,
   TransactionRepository,
-} from 'src/app/database/repositories';
-import { AccountRepository } from 'src/app/database/repositories/account.repository';
+} from 'src/app/database';
 import { MappingsService } from 'src/app/services/mappings.service';
-import { PayeePickerModal } from './payee-picker.modal';
+import { PayeePickerModal } from './components/payee-picker.modal';
 
 @Component({
   templateUrl: 'transaction-details.page.html',
@@ -34,7 +32,7 @@ export class TransactionDetailsPage implements OnInit, OnDestroy {
     private accountRepo: AccountRepository,
     private transactionRepo: TransactionRepository,
     private payeeRepo: PayeeRepository,
-    private mappingsService: MappingsService
+    private mappingsService: MappingsService,
   ) {}
 
   public ngOnInit() {
@@ -61,20 +59,20 @@ export class TransactionDetailsPage implements OnInit, OnDestroy {
                   transaction: t,
                   payee: payee,
                 };
-              })
+              }),
             );
-          })
+          }),
         )
         .subscribe((result) => {
           this.transaction = result.transaction;
           this.payee = result.payee;
-        })
+        }),
     );
 
     this.subscriptions.add(
       this.accountRepo.getAll$().subscribe((accounts) => {
         this.accounts = accounts;
-      })
+      }),
     );
   }
 
@@ -86,12 +84,12 @@ export class TransactionDetailsPage implements OnInit, OnDestroy {
     const newAccountId: string = ev.detail.value;
     await this.transactionRepo.updateAccountForTransaction(
       this.transaction.id,
-      newAccountId
+      newAccountId,
     );
 
     await this.mappingsService.mapAccount(
       this.transaction.rawAccount,
-      newAccountId
+      newAccountId,
     );
   }
 
@@ -109,11 +107,11 @@ export class TransactionDetailsPage implements OnInit, OnDestroy {
     if (data?.payeeId) {
       await this.transactionRepo.updatePayeeForTransaction(
         this.transaction.id,
-        data.payeeId
+        data.payeeId,
       );
       await this.mappingsService.mapPayee(
         this.transaction.rawPayee,
-        data.payeeId
+        data.payeeId,
       );
     }
   }

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 
 import { RouterModule, Routes } from '@angular/router';
 import { TransactionDetailsPage } from './transaction-details.page';
+import { PayeePickerModal } from './components/payee-picker.modal';
 
 const routes: Routes = [
   {
@@ -21,6 +22,6 @@ export class SettingsTabRoutingModule {}
 
 @NgModule({
   imports: [IonicModule, CommonModule, FormsModule, SettingsTabRoutingModule],
-  declarations: [],
+  declarations: [TransactionDetailsPage, PayeePickerModal],
 })
 export class SettingsTabModule {}

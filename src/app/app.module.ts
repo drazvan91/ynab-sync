@@ -1,25 +1,17 @@
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
-
-import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
-
+import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { SyncService } from './services/sync.service';
-import { SmsService } from './services/sms.service';
-import { CommonModule } from '@angular/common';
-import { TransactionDetailsPage } from './pages/transaction-details/transaction-details.page';
-import { PayeePickerModal } from './pages/transaction-details/payee-picker.modal';
-import { SmsReaderService } from './services/sms-reader.service';
-import { SmsParserService } from './services/sms-parser.service';
-import { MappingsService } from './services/mappings.service';
-import { DatabaseModule } from './database/database.module';
+import { DatabaseModule } from './database';
+import { ServicesModule } from './services';
 
 @NgModule({
-  declarations: [AppComponent, TransactionDetailsPage, PayeePickerModal],
+  declarations: [AppComponent],
   entryComponents: [],
   imports: [
     BrowserModule,
@@ -29,15 +21,12 @@ import { DatabaseModule } from './database/database.module';
       mode: 'md',
     }),
     AppRoutingModule,
+    ServicesModule,
   ],
   providers: [
     StatusBar,
     SplashScreen,
-    SyncService,
-    SmsService,
-    SmsReaderService,
-    SmsParserService,
-    MappingsService,
+
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
   bootstrap: [AppComponent],

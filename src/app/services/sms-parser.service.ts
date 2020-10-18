@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SmsModel } from './sms-reader.service';
 import { ParsedSms } from './sms.service';
+
 @Injectable()
 export class SmsParserService {
   public parse(smsList: SmsModel[]): ParsedSms[] {
