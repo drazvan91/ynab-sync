@@ -1,11 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { RxDocument } from 'rxdb';
-import { Observable } from 'rxjs';
-import { AccountRepository } from '../database/account.repository';
-import { BudgetRepository } from '../database/budget.repository';
-import { ConfigRepository } from '../database/config.repository';
-import { BudgetModel } from '../database/models';
-import { AccountDbModel } from '../database/models/db-context';
+import { BudgetDbModel } from '../database/models/db-context';
+import { BudgetRepository, ConfigRepository } from '../database/repositories';
 import { SmsService } from '../services/sms.service';
 import { SyncService } from '../services/sync.service';
 
@@ -15,14 +10,13 @@ import { SyncService } from '../services/sync.service';
   styleUrls: ['tab2.page.scss'],
 })
 export class Tab2Page implements OnInit {
-  public budgets: BudgetModel[];
+  public budgets: BudgetDbModel[];
   public selectedBudgetId?: string;
   public startDate: string;
   public ynabToken: string;
 
   constructor(
     private budgetRepo: BudgetRepository,
-    private accountsRepo: AccountRepository,
     private syncService: SyncService,
     private smsService: SmsService,
     private configRepo: ConfigRepository
@@ -32,7 +26,7 @@ export class Tab2Page implements OnInit {
     this.budgets = await this.budgetRepo.getAll();
     this.selectedBudgetId = await this.budgetRepo.getSelected();
 
-    this.startDate = await (await this.configRepo.getStartDate())?.toString();
+    this.startDate = (await this.configRepo.getStartDate())?.toString();
     this.ynabToken = (await this.configRepo.getToken()) || '';
   }
 
@@ -47,7 +41,6 @@ export class Tab2Page implements OnInit {
 
   public async budgetChanged(ev: CustomEvent) {
     await this.budgetRepo.setSelected(ev.detail.value);
-    // await this.accountsRepo.setAll([]);
   }
 
   public async startDateChanged(ev: CustomEvent) {

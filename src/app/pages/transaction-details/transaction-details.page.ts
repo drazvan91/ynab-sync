@@ -1,14 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ModalController } from '@ionic/angular';
-import { AccountRepository } from 'src/app/database/account.repository';
+import { RxDocument } from 'rxdb';
+import { of, Subscription } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import {
-  AccountModel,
-  TransactionModel,
-  TransactionStatus,
-} from 'src/app/database/models';
-import { PayeeRepository } from 'src/app/database/payee.repository';
-import { TransactionRepository } from 'src/app/database/transaction.repository';
+  AccountDbModel,
+  PayeeDbModel,
+  TransactionDbModel,
+} from 'src/app/database/models/db-context';
+import {
+  PayeeRepository,
+  TransactionRepository,
+} from 'src/app/database/repositories';
+import { AccountRepository } from 'src/app/database/repositories/account.repository';
 import { MappingsService } from 'src/app/services/mappings.service';
 import { PayeePickerModal } from './payee-picker.modal';
 
@@ -16,9 +21,12 @@ import { PayeePickerModal } from './payee-picker.modal';
   templateUrl: 'transaction-details.page.html',
   styleUrls: [],
 })
-export class TransactionDetailsPage implements OnInit {
-  public transaction?: TransactionModel;
-  public accounts: AccountModel[];
+export class TransactionDetailsPage implements OnInit, OnDestroy {
+  public transaction: TransactionDbModel;
+  public accounts: AccountDbModel[];
+  public payee: RxDocument<PayeeDbModel>;
+
+  private subscriptions = new Subscription();
 
   constructor(
     private route: ActivatedRoute,
@@ -29,22 +37,61 @@ export class TransactionDetailsPage implements OnInit {
     private mappingsService: MappingsService
   ) {}
 
-  async ngOnInit() {
-    this.route.params.subscribe(async (p) => {
-      console.log(p);
-      this.transaction = await this.transactionRepo.getById(p.id);
-    });
+  public ngOnInit() {
+    this.subscriptions.add(
+      this.route.params
+        .pipe(
+          switchMap((p) => {
+            console.log('param changed');
+            return this.transactionRepo.getById$(p.id);
+          }),
+          switchMap((t) => {
+            console.log('transaction changed', t.payeeId);
+            if (!t.payeeId) {
+              return of({
+                transaction: t,
+                payee: undefined,
+              });
+            }
 
-    this.accounts = await this.accountRepo.getAll();
+            return this.payeeRepo.getById$(t.payeeId).pipe(
+              map((payee) => {
+                console.log('payee changed', payee.id);
+                return {
+                  transaction: t,
+                  payee: payee,
+                };
+              })
+            );
+          })
+        )
+        .subscribe((result) => {
+          this.transaction = result.transaction;
+          this.payee = result.payee;
+        })
+    );
+
+    this.subscriptions.add(
+      this.accountRepo.getAll$().subscribe((accounts) => {
+        this.accounts = accounts;
+      })
+    );
+  }
+
+  public ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   public async accountChanged(ev: CustomEvent) {
-    const account = this.accounts.find((a) => a.id === ev.detail.value);
-    this.transaction.account = account;
-    await this.save();
+    const newAccountId: string = ev.detail.value;
+    await this.transactionRepo.updateAccountForTransaction(
+      this.transaction.id,
+      newAccountId
+    );
+
     await this.mappingsService.mapAccount(
       this.transaction.rawAccount,
-      account.id
+      newAccountId
     );
   }
 
@@ -53,33 +100,21 @@ export class TransactionDetailsPage implements OnInit {
       component: PayeePickerModal,
       cssClass: 'my-custom-class',
       componentProps: {
-        selectedPayeeId: this.transaction.payee?.id,
+        selectedPayeeId: this.transaction.payeeId,
       },
     });
-
     await modal.present();
-
     const { data } = await modal.onWillDismiss();
 
     if (data?.payeeId) {
-      const payee = await this.payeeRepo.getById(data.payeeId);
-      this.transaction.payee = payee;
-      await this.save();
-      await this.mappingsService.mapPayee(this.transaction.rawPayee, payee.id);
+      await this.transactionRepo.updatePayeeForTransaction(
+        this.transaction.id,
+        data.payeeId
+      );
+      await this.mappingsService.mapPayee(
+        this.transaction.rawPayee,
+        data.payeeId
+      );
     }
-  }
-
-  private async save() {
-    if (!this.transaction) {
-      return;
-    }
-
-    if (this.transaction.status === TransactionStatus.NotReady) {
-      if (this.transaction.account && this.transaction.payee) {
-        this.transaction.status = TransactionStatus.Ready;
-      }
-    }
-
-    await this.transactionRepo.save(this.transaction);
   }
 }

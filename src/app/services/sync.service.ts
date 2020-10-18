@@ -1,17 +1,19 @@
 import { Injectable } from '@angular/core';
-import { formatISO } from 'date-fns';
+import { formatISO, fromUnixTime } from 'date-fns';
 import { API, BulkTransactions, SaveTransaction } from 'ynab';
-import { AccountRepository } from '../database/account.repository';
-import { BudgetRepository } from '../database/budget.repository';
-import { ConfigRepository } from '../database/config.repository';
 import {
-  AccountModel,
-  BudgetModel,
-  PayeeModel,
+  AccountDbModel,
+  BudgetDbModel,
+  PayeeDbModel,
   TransactionStatus,
 } from '../database/models';
-import { PayeeRepository } from '../database/payee.repository';
-import { TransactionRepository } from '../database/transaction.repository';
+import {
+  AccountRepository,
+  BudgetRepository,
+  ConfigRepository,
+  PayeeRepository,
+  TransactionRepository,
+} from '../database/repositories';
 
 @Injectable()
 export class SyncService {
@@ -19,8 +21,8 @@ export class SyncService {
     private accountsRepo: AccountRepository,
     private budgetRepo: BudgetRepository,
     private payeeRepo: PayeeRepository,
+    private configRepo: ConfigRepository,
     private transactionRepo: TransactionRepository,
-    private configRepo: ConfigRepository
   ) {}
 
   private async getYnabApi(): Promise<API> {
@@ -29,7 +31,7 @@ export class SyncService {
   }
 
   public async sync() {
-    const budgets = await this.syncBudgets();
+    await this.syncBudgets();
 
     const budgetId = await this.budgetRepo.getSelected();
     if (!budgetId) {
@@ -45,7 +47,7 @@ export class SyncService {
     const existingAccounts = await this.accountsRepo.getAll();
 
     const response = await ynabApi.accounts.getAccounts(budgetId);
-    const accounts = response.data.accounts.map<AccountModel>((a) => {
+    const accounts = response.data.accounts.map<AccountDbModel>((a) => {
       const existingAccount = existingAccounts.find((ea) => ea.id === a.id);
       return {
         id: a.id,
@@ -60,68 +62,76 @@ export class SyncService {
   private async syncPayees(budgetId: string) {
     const ynabApi = await this.getYnabApi();
 
-    const existingPayees = await this.payeeRepo.getAll();
-
     const response = await ynabApi.payees.getPayees(budgetId);
-    const payees = response.data.payees.map<PayeeModel>((p) => {
-      const existingPayee = existingPayees.find((ep) => ep.id === p.id);
+    const payees = response.data.payees.map<PayeeDbModel>((p) => {
       return {
         id: p.id,
         name: p.name,
-        mappedNames: existingPayee?.mappedNames || [],
+        mappedNames: [],
       };
     });
 
-    await this.payeeRepo.setAll(payees);
+    await this.payeeRepo.syncPayees(payees);
   }
 
   private async syncBudgets() {
     const ynabApi = await this.getYnabApi();
 
     const response = await ynabApi.budgets.getBudgets(false);
-    const budgets = response.data.budgets.map<BudgetModel>((b) => {
+    const budgets = response.data.budgets.map<BudgetDbModel>((b) => {
       return {
         id: b.id,
         name: b.name,
       };
     });
 
-    await this.budgetRepo.setAll(budgets);
-    return budgets;
+    await this.budgetRepo.syncBudgets(budgets);
   }
 
   public async syncTransactions() {
-    const allTransactions = await this.transactionRepo.getAll();
-    const readyTransactions = allTransactions.filter(
-      (t) => t.status === TransactionStatus.Synced
-    );
-
-    const bulkTransactions: BulkTransactions = {
-      transactions: readyTransactions.map<SaveTransaction>((t) => {
-        return {
-          account_id: t.account.id,
-          date: formatISO(t.date),
-          amount: Math.floor(t.amount * 1000) + 0.1,
-          payee_id: t.payee.id,
-          category_id: null,
-          flag_color: SaveTransaction.FlagColorEnum.Blue,
-          import_id: 'impor' + t.id,
-        };
-      }),
-    };
-
     const budgetId = await this.budgetRepo.getSelected();
     if (!budgetId) {
       throw 'No budget selected';
     }
 
-    const ynabApi = await this.getYnabApi();
-    await ynabApi.transactions.bulkCreateTransactions(
-      budgetId,
-      bulkTransactions
+    const toSyncTransactions = await this.transactionRepo.getReadyToSync();
+    const bulkTransactions: BulkTransactions = {
+      transactions: toSyncTransactions.map<SaveTransaction>((t) => {
+        return {
+          account_id: t.accountId,
+          date: formatISO(fromUnixTime(t.dateUnix)),
+          amount: Math.floor(t.amount * 1000),
+          payee_id: t.payeeId,
+          category_id: null,
+          flag_color: SaveTransaction.FlagColorEnum.Blue,
+          import_id: 'impo' + t.id,
+        };
+      }),
+    };
+
+    const transactionIds = toSyncTransactions.map((t) => t.id);
+    await this.transactionRepo.bulkSetStatus(
+      transactionIds,
+      TransactionStatus.Syncing,
     );
 
-    readyTransactions.forEach((t) => (t.status = TransactionStatus.Synced));
-    await this.transactionRepo.setAll(allTransactions);
+    try {
+      const ynabApi = await this.getYnabApi();
+      await ynabApi.transactions.bulkCreateTransactions(
+        budgetId,
+        bulkTransactions,
+      );
+    } catch {
+      await this.transactionRepo.bulkSetStatus(
+        transactionIds,
+        TransactionStatus.New,
+      );
+      return;
+    }
+
+    await this.transactionRepo.bulkSetStatus(
+      transactionIds,
+      TransactionStatus.Synced,
+    );
   }
 }

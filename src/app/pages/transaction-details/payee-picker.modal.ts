@@ -1,8 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { PayeeModel } from 'src/app/database/models';
-import { PayeeRepository } from 'src/app/database/payee.repository';
-import { MappingsService } from 'src/app/services/mappings.service';
+import { PayeeRepository } from 'src/app/database/repositories';
 
 @Component({
   templateUrl: 'payee-picker.modal.html',
@@ -10,7 +8,7 @@ import { MappingsService } from 'src/app/services/mappings.service';
 })
 export class PayeePickerModal implements OnInit {
   @Input() selectedPayeeId?: string;
-  public payees: PayeeModel[];
+  public payees$ = this.payeeRepo.getAll$();
 
   constructor(
     private modalCtrl: ModalController,
@@ -18,7 +16,7 @@ export class PayeePickerModal implements OnInit {
   ) {}
 
   async ngOnInit() {
-    this.payees = await this.payeeRepo.getAll();
+    // this.payees = await this.payeeRepo.getAll();
   }
 
   public async selectPayee(payeeId: string) {

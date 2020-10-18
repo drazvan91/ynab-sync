@@ -30,19 +30,23 @@
       <ion-list style="flex: 1">
         <ion-item
           [routerLink]="['/transaction',transaction.id]"
-          *ngFor="let transaction of transactions"
+          *ngFor="let transaction of transactions$ | async"
         >
           <ion-avatar slot="end">
             <ion-icon [name]="getIconName(transaction)"></ion-icon>
           </ion-avatar>
           <ion-label>
             <h2>
-              {{ transaction.date | date }} - {{ transaction.payee?.name ||
-              "UNKWNOWN" }}
+              {{ transaction.date | date }} - {{ transaction.payeeName }}
+              <span *ngIf="!transaction.payeeName" style="color: red"
+                >UNKWNOWN</span
+              >
             </h2>
             <h3>
-              {{transaction.amount }} RON - {{ transaction.account?.name ||
-              "UNKWNON" }}
+              {{transaction.amount }} RON - {{ transaction.accountName }}
+              <span *ngIf="!transaction.accountName" style="color: red"
+                >UNKWNOWN</span
+              >
             </h3>
             <p>{{transaction.rawPayee }}</p>
           </ion-label>

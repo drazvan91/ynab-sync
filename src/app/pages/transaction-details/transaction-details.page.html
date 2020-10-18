@@ -20,7 +20,7 @@
       <ion-label>Account</ion-label>
 
       <ion-select
-        [value]="transaction.account?.id"
+        [value]="transaction.accountId"
         placeholder="Select One"
         (ionChange)="accountChanged($event)"
       >
@@ -35,10 +35,8 @@
     </ion-item>
     <ion-item (click)="openPayeeModal()">
       <ion-label>Payee</ion-label>
-      <ion-button *ngIf="!transaction.payee"> Pick one </ion-button>
-      <ion-note *ngIf="transaction.payee" slot="end">
-        {{transaction.payee.name}}
-      </ion-note>
+      <ion-button *ngIf="!payee"> Pick one </ion-button>
+      <ion-note *ngIf="payee" slot="end"> {{payee.name}} </ion-note>
     </ion-item>
     <ion-item>
       <ion-label>Raw payee</ion-label>
