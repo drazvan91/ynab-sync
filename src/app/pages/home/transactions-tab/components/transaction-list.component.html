@@ -1,0 +1,28 @@
+<ion-card>
+  <h2 *ngIf="items?.length == 0">No transactions</h2>
+  <ion-list>
+    <ion-item
+      *ngFor="let transaction of items"
+      [routerLink]="['/transaction', transaction.id]"
+    >
+      <ion-avatar slot="end">
+        <!-- <ion-icon [name]="getIconName(transaction)"></ion-icon> -->
+      </ion-avatar>
+      <ion-label>
+        <h2>
+          {{ transaction.date | date }} - {{ transaction.payeeName }}
+          <span *ngIf="!transaction.payeeName" style="color: red"
+            >UNKWNOWN</span
+          >
+        </h2>
+        <h3>
+          {{ transaction.amount }} RON - {{ transaction.accountName }}
+          <span *ngIf="!transaction.accountName" style="color: red"
+            >UNKWNOWN</span
+          >
+        </h3>
+        <p>{{ transaction.rawPayee }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-card>

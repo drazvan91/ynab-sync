@@ -2,19 +2,19 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { IonSlides } from '@ionic/angular';
 import { fromUnixTime } from 'date-fns';
 import { combineLatest } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import {
   AccountDbModel,
   PayeeDbModel,
   TransactionDbModel,
   TransactionStatus,
-} from '../database/models';
+} from 'src/app/database/models';
 import {
   AccountRepository,
   PayeeRepository,
   TransactionRepository,
-} from '../database/repositories';
-import { SyncService } from '../services/sync.service';
+} from 'src/app/database/repositories';
+import { SyncService } from 'src/app/services/sync.service';
 
 interface TransactionItem {
   id: string;
@@ -26,31 +26,54 @@ interface TransactionItem {
   date: Date;
 }
 
+const sliderNamesMap = {
+  'not-ready-transactions': 0,
+  'synced-transactions': 1,
+  'all-transactions': 2,
+};
+
 @Component({
-  selector: 'app-tab1',
-  templateUrl: 'tab1.page.html',
-  styleUrls: ['tab1.page.scss'],
+  selector: 'home-transactions-tab',
+  templateUrl: 'transactions.tab.html',
+  styleUrls: [],
 })
-export class Tab1Page implements OnInit {
+export class TransactionsTab implements OnInit {
   @ViewChild('slider', { static: false }) slider: IonSlides;
 
-  public transactions$ = combineLatest([
+  public notReadyTransactions$ = combineLatest([
+    this.transactionRepo.getNotReadyToSync$(),
+    this.accountRepo.getAll$(),
+    this.payeeRepo.getAll$(),
+  ]).pipe(
+    map(([transactions, accounts, payees]) => {
+      return this.mapToItems(transactions, accounts, payees);
+    }),
+  );
+
+  public readyToSyncTransactions$ = combineLatest([
+    this.transactionRepo.getReadyToSync$(),
+    this.accountRepo.getAll$(),
+    this.payeeRepo.getAll$(),
+  ]).pipe(
+    map(([transactions, accounts, payees]) => {
+      return this.mapToItems(transactions, accounts, payees);
+    }),
+  );
+
+  public allTransactions$ = combineLatest([
     this.transactionRepo.getAll$(),
     this.accountRepo.getAll$(),
     this.payeeRepo.getAll$(),
   ]).pipe(
-    map((v) => {
-      return this.mapToItems(v[0], v[1], v[2]);
+    map(([transactions, accounts, payees]) => {
+      return this.mapToItems(transactions, accounts, payees);
     }),
-    tap((trs) => {
-      console.log(trs);
-    })
   );
 
   private mapToItems(
     transactions: TransactionDbModel[],
     accounts: AccountDbModel[],
-    payees: PayeeDbModel[]
+    payees: PayeeDbModel[],
   ) {
     return transactions.map<TransactionItem>((t) => {
       return {
@@ -65,9 +88,9 @@ export class Tab1Page implements OnInit {
     });
   }
 
-  public selectedSegment = 'new-transactions';
+  public selectedSegment = 'not-ready-transactions';
   public slideOpts = {
-    initialSlide: 1,
+    initialSlide: 0,
     speed: 400,
   };
 
@@ -77,7 +100,7 @@ export class Tab1Page implements OnInit {
     private transactionRepo: TransactionRepository,
     private accountRepo: AccountRepository,
     private payeeRepo: PayeeRepository,
-    private syncService: SyncService
+    private syncService: SyncService,
   ) {}
 
   async ngOnInit() {
@@ -101,14 +124,17 @@ export class Tab1Page implements OnInit {
 
   public segmentChanged(ev: CustomEvent) {
     this.selectedSegment = ev.detail.value;
-    const gotoSlideIndex = this.selectedSegment === 'new-transactions' ? 0 : 1;
+    const gotoSlideIndex = sliderNamesMap[this.selectedSegment];
     this.slider.slideTo(gotoSlideIndex);
   }
 
   public async sliderWillChange(ev: CustomEvent) {
     const active = await this.slider.getActiveIndex();
-    this.selectedSegment =
-      active === 0 ? 'new-transactions' : 'synced-transactions';
+    for (const key in sliderNamesMap) {
+      if (sliderNamesMap[key] === active) {
+        this.selectedSegment = key;
+      }
+    }
   }
 
   public async syncTransactions() {

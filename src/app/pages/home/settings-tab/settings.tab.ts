@@ -1,15 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { BudgetDbModel } from '../database/models/db-context';
-import { BudgetRepository, ConfigRepository } from '../database/repositories';
-import { SmsService } from '../services/sms.service';
-import { SyncService } from '../services/sync.service';
+import { BudgetDbModel } from 'src/app/database/models';
+import {
+  BudgetRepository,
+  ConfigRepository,
+} from 'src/app/database/repositories';
+import { SmsService } from 'src/app/services/sms.service';
+import { SyncService } from 'src/app/services/sync.service';
 
 @Component({
-  selector: 'app-tab2',
-  templateUrl: 'tab2.page.html',
-  styleUrls: ['tab2.page.scss'],
+  selector: 'home-settings-tab',
+  templateUrl: 'settings.tab.html',
+  styleUrls: [],
 })
-export class Tab2Page implements OnInit {
+export class SettingsTab implements OnInit {
   public budgets: BudgetDbModel[];
   public selectedBudgetId?: string;
   public startDate: string;
@@ -19,7 +22,7 @@ export class Tab2Page implements OnInit {
     private budgetRepo: BudgetRepository,
     private syncService: SyncService,
     private smsService: SmsService,
-    private configRepo: ConfigRepository
+    private configRepo: ConfigRepository,
   ) {}
 
   public async ngOnInit() {

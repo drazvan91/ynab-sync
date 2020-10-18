@@ -14,17 +14,34 @@ export class TransactionRepository {
     return await this.dbProvider.get().transactions.find().exec();
   }
 
+  public getReadyToSync$() {
+    return this.getReadyToSyncInternal().$;
+  }
+
   public async getReadyToSync(): Promise<TransactionDbModel[]> {
-    return await this.dbProvider
-      .get()
-      .transactions.find({
-        selector: {
-          accountId: { $exists: true },
-          payeeId: { $exists: true },
-          status: TransactionStatus.New,
-        },
-      })
-      .exec();
+    return await this.getReadyToSyncInternal().exec();
+  }
+
+  private getReadyToSyncInternal() {
+    return this.dbProvider.get().transactions.find({
+      selector: {
+        accountId: { $exists: true },
+        payeeId: { $exists: true },
+        status: TransactionStatus.New,
+      },
+    });
+  }
+
+  public getNotReadyToSync$() {
+    return this.dbProvider.get().transactions.find({
+      selector: {
+        status: TransactionStatus.New,
+        $or: [
+          { accountId: { $exists: false } },
+          { payeeId: { $exists: false } },
+        ],
+      },
+    }).$;
   }
 
   public getById$(transactionId: string) {
