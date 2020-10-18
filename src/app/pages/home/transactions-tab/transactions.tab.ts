@@ -31,9 +31,15 @@ const sliderNamesMap = {
 export class TransactionsTab implements OnInit {
   @ViewChild('slider', { static: false }) slider: IonSlides;
 
-  public hasValidChanges$ = this.transactionRepo.getReadyToSync$().pipe(
+  public readyToSyncCount$ = this.transactionRepo.getReadyToSync$().pipe(
     map((transactions) => {
-      return transactions.length > 0;
+      return transactions.length;
+    }),
+  );
+
+  public notReadyToSyncCount$ = this.transactionRepo.getNotReadyToSync$().pipe(
+    map((transactions) => {
+      return transactions.length;
     }),
   );
 

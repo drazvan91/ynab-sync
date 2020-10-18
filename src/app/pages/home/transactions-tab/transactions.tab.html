@@ -3,21 +3,32 @@
     <ion-title> Transaction </ion-title>
     <ion-button
       slot="end"
-      [disabled]="!(hasValidChanges$ | async)"
+      [disabled]="(readyToSyncCount$ | async) === 0"
       (click)="syncTransactions()"
       >Sync</ion-button
     >
   </ion-toolbar>
   <ion-segment
     color="primary"
+    scrollable="true"
     [value]="selectedSegment"
     (ionChange)="segmentChanged($event)"
   >
     <ion-segment-button value="not-ready-transactions">
-      <ion-label>Not ready</ion-label>
+      <ion-label>
+        <span>Not ready</span>
+        <ion-badge *ngIf="(notReadyToSyncCount$ | async) > 0" color="danger">
+          {{notReadyToSyncCount$ | async}}
+        </ion-badge>
+      </ion-label>
     </ion-segment-button>
     <ion-segment-button value="synced-transactions">
-      <ion-label>Not synced</ion-label>
+      <ion-label>
+        <span>Not synced</span>
+        <ion-badge *ngIf="(readyToSyncCount$ | async) > 0" color="primary">
+          {{readyToSyncCount$ | async}}
+        </ion-badge>
+      </ion-label>
     </ion-segment-button>
     <ion-segment-button value="all-transactions">
       <ion-label>All</ion-label>

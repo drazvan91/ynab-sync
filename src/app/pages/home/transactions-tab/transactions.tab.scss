@@ -4,5 +4,16 @@
       --ion-toolbar-background,
       var(--ion-background-color, #fff)
     );
+
+    ion-segment-button ion-label {
+      > span {
+        vertical-align: middle;
+      }
+
+      > ion-badge {
+        margin-left: 6px;
+        vertical-align: middle;
+      }
+    }
   }
 }
